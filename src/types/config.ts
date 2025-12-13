@@ -27,6 +27,6 @@ export interface AIProvider {
 
 export interface AIConfig {
   providers: AIProvider[];
-  defaultProviderId?: string;
+  defaultProviderName?: string;
   defaultModel?: string;
 }

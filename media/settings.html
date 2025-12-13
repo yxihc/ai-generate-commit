@@ -629,18 +629,19 @@
               <span class="settings-icon" @click.stop="editProviderName(provider)">⚙️</span>
             </div>
             <!-- Collapsed Summary -->
-            <div v-if="provider.collapsed" class="card-summary">
-              <div class="summary-item">
+            <div v-if="provider.collapsed" class="card-summary" @click.stop>
+              <div class="summary-item" @click.stop="toggleProviderEnabled(provider)" style="cursor: pointer;">
                 <span class="status-dot" :class="{ active: provider.enabled !== false }"></span>
                 <span>{{ provider.enabled !== false ? t.enabled : t.disabled }}</span>
               </div>
               <div class="summary-item">🏷️ {{ getProviderTypeLabel(provider.type) }}</div>
               <div class="summary-item">🤖 {{ provider.models.length }} {{ t.models }}</div>
               <div class="summary-item" v-if="provider.baseUrl">🔗 {{ getHostname(provider.baseUrl) }}</div>
+              <div class="toggle-switch" :class="{ active: provider.enabled !== false }" @click.stop="toggleProviderEnabled(provider)" style="margin-left: auto;"></div>
             </div>
             <div v-else style="display: flex; align-items: center; gap: 12px;">
               <span style="font-size: 12px; color: var(--vscode-descriptionForeground);">🏷️ {{ getProviderTypeLabel(provider.type) }}</span>
-              <div class="toggle-switch" :class="{ active: provider.enabled !== false }" @click.stop="provider.enabled = !provider.enabled"></div>
+              <div class="toggle-switch" :class="{ active: provider.enabled !== false }" @click.stop="toggleProviderEnabled(provider)"></div>
             </div>
           </div>
 
@@ -726,9 +727,9 @@
         <h3>{{ t.defaultSettings }}</h3>
         <div class="form-group">
           <label>{{ t.defaultProvider }}</label>
-          <select v-model="defaultProviderId" @change="onDefaultProviderChange">
+          <select v-model="defaultProviderName" @change="onDefaultProviderChange">
             <option value="">{{ t.selectProvider }}</option>
-            <option v-for="p in providers" :value="p.id">{{ p.name }}</option>
+            <option v-for="p in enabledProviders" :value="p.name">{{ p.name }}</option>
           </select>
         </div>
         <div class="form-group">
@@ -1006,7 +1007,7 @@
       createApp({
         setup() {
           const providers = ref([]);
-          const defaultProviderId = ref("");
+          const defaultProviderName = ref("");
           const defaultModel = ref("");
           const language = ref("zh-CN");
           const customPrompt = ref("");
@@ -1047,8 +1048,12 @@
             name: ""
           });
 
+          const enabledProviders = computed(() => {
+            return providers.value.filter(p => p.enabled !== false);
+          });
+
           const currentProviderModels = computed(() => {
-            const provider = providers.value.find(p => p.id === defaultProviderId.value);
+            const provider = providers.value.find(p => p.name === defaultProviderName.value);
             return provider?.models || [];
           });
 
@@ -1065,7 +1070,7 @@
                   modelsExpanded: true,
                   collapsed: true // 默认折叠
                 }));
-                defaultProviderId.value = message.data.defaultProviderId || "";
+                defaultProviderName.value = message.data.defaultProviderName || "";
                 defaultModel.value = message.data.defaultModel || "";
                 language.value = message.data.language || "zh-CN";
                 customPrompt.value = message.data.customPrompt || "";
@@ -1173,6 +1178,10 @@
             provider.collapsed = !provider.collapsed;
           }
 
+          function toggleProviderEnabled(provider) {
+            provider.enabled = provider.enabled === false ? true : false;
+          }
+
           function getHostname(url) {
             try {
               return new URL(url).hostname;
@@ -1194,8 +1203,8 @@
 
           function removeProvider(index) {
             const p = providers.value[index];
-            if (defaultProviderId.value === p.id) {
-              defaultProviderId.value = "";
+            if (defaultProviderName.value === p.name) {
+              defaultProviderName.value = "";
               defaultModel.value = "";
             }
             providers.value.splice(index, 1);
@@ -1364,7 +1373,7 @@
           }
 
           function onDefaultProviderChange() {
-            const provider = providers.value.find(p => p.id === defaultProviderId.value);
+            const provider = providers.value.find(p => p.name === defaultProviderName.value);
             defaultModel.value = provider?.models?.[0]?.id || "";
           }
 
@@ -1391,7 +1400,7 @@
                 command: "save-config",
                 data: { 
                   providers: data, 
-                  defaultProviderId: defaultProviderId.value, 
+                  defaultProviderName: defaultProviderName.value, 
                   defaultModel: defaultModel.value,
                   language: language.value,
                   customPrompt: customPrompt.value
@@ -1413,13 +1422,13 @@
           }
 
           return {
-            providers, defaultProviderId, defaultModel, language, customPrompt, currentProviderModels,
+            providers, defaultProviderName, defaultModel, language, customPrompt, currentProviderModels, enabledProviders,
             showAddModelModal, newModel,
             currentEditingProvider, toast, saving, t, uiLanguage,
             addProvider, removeProvider, editProviderName, testApiKey, fetchModels,
             openAddModelModal, addModel, removeModel, autoFillModelName,
             openManageModal, onDefaultProviderChange, saveSettings, showToast,
-            toggleProviderCollapse, getHostname, getProviderTypeLabel,
+            toggleProviderCollapse, toggleProviderEnabled, getHostname, getProviderTypeLabel,
             // Manage modal
             showManageModal, manageProvider, manageSearch, manageLoading,
             manageModels, manageExpandedGroups, filteredManageModels, manageSortAsc,

@@ -1,5 +1,4 @@
 import { streamText } from "ai";
-import * as vscode from "vscode";
 import { AIManager } from "./ai-manager";
 import { PromptUtils } from "../utils/prompt";
 import { Logger } from "../utils/logger";
@@ -10,9 +9,9 @@ export async function generateCommitMessageStream(
   onChunk: (chunk: string) => void,
   options?: { providerId?: string; modelId?: string }
 ): Promise<string> {
-  const config = vscode.workspace.getConfiguration("ai-generate-commit");
+  const config = AIManager.getConfig();
   // Use existing language setting or default to zh-CN
-  const language = config.get<string>("language") || "zh-CN";
+  const language = config.language || "zh-CN";
 
   let provider;
   if (options?.providerId) {

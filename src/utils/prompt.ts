@@ -45,8 +45,9 @@ export class PromptUtils {
    * 获取用户自定义提示词配置
    */
   private static getCustomPrompt(): string {
-    const config = vscode.workspace.getConfiguration("ai-generate-commit");
-    return config.get<string>("customPrompt", "").trim();
+    const vsConfig = vscode.workspace.getConfiguration("ai-generate-commit");
+    const config = vsConfig.get<any>("config") || {};
+    return (config.customPrompt || "").trim();
   }
 
   /**

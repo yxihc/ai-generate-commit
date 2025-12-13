@@ -37,8 +37,7 @@
       "scm/title": [
         {
           "command": "ai-generate-commit.generate",
-          "group": "navigation",
-          "when": "config.ai-generate-commit.defaultProviderId != ''"
+          "group": "navigation"
         },
         {
           "command": "ai-generate-commit.selectAndGenerate",
@@ -58,29 +57,15 @@
           "default": false,
           "markdownDescription": "%config.openConfigurationPage%"
         },
-        "ai-generate-commit.providers": {
-          "type": "array",
-          "default": [],
-          "scope": "application"
-        },
-        "ai-generate-commit.defaultProviderId": {
-          "type": "string",
-          "default": "",
-          "scope": "application"
-        },
-        "ai-generate-commit.defaultModel": {
-          "type": "string",
-          "default": "",
-          "scope": "application"
-        },
-        "ai-generate-commit.language": {
-          "type": "string",
-          "default": "zh-CN",
-          "scope": "application"
-        },
-        "ai-generate-commit.customPrompt": {
-          "type": "string",
-          "default": "",
+        "ai-generate-commit.config": {
+          "type": "object",
+          "default": {
+            "providers": [],
+            "defaultProviderName": "",
+            "defaultModel": "",
+            "language": "zh-CN",
+            "customPrompt": ""
+          },
           "scope": "application"
         }
       }

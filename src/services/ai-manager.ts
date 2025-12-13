@@ -6,35 +6,19 @@ import { Logger } from "../utils/logger";
 import { localize } from "../utils/i18n";
 
 export class AIManager {
+  static getConfig() {
+    const vsConfig = vscode.workspace.getConfiguration("ai-generate-commit");
+    return vsConfig.get<any>("config") || {};
+  }
+
   static getProviders(): AIProvider[] {
-    const config = vscode.workspace.getConfiguration("ai-generate-commit");
-    const rawProviders = config.get<any[]>("providers") || [];
-
-    if (rawProviders.length === 0) {
-      // Check legacy config
-      const apiKey = config.get<string>("openai.apiKey");
-      const baseUrl = config.get<string>("openai.baseUrl");
-      const model = config.get<string>("openai.model");
-
-      if (apiKey || baseUrl) {
-        return [
-          {
-            id: "legacy-openai",
-            name: "OpenAI (Legacy)",
-            type: "openai",
-            apiKey: apiKey || "",
-            baseUrl: baseUrl || "https://api.openai.com/v1",
-            models: model ? [{ id: model }] : [{ id: "gpt-3.5-turbo" }],
-            enabled: true,
-          },
-        ];
-      }
-    }
+    const config = this.getConfig();
+    const rawProviders = config.providers || [];
 
     // Normalize providers and filter disabled ones
     return rawProviders
-      .filter(p => p.enabled !== false)
-      .map(p => ({
+      .filter((p: any) => p.enabled !== false)
+      .map((p: any) => ({
         ...p,
         // Normalize models: convert string[] to AIModel[]
         models: (p.models || []).map((m: any) => 
@@ -48,12 +32,12 @@ export class AIManager {
   }
 
   static getDefaultProvider(): AIProvider | undefined {
-    const config = vscode.workspace.getConfiguration("ai-generate-commit");
-    const defaultId = config.get<string>("defaultProviderId");
+    const config = this.getConfig();
+    const defaultName = config.defaultProviderName;
     const providers = this.getProviders();
 
-    if (defaultId) {
-      const provider = providers.find((p) => p.id === defaultId);
+    if (defaultName) {
+      const provider = providers.find((p) => p.name === defaultName);
       if (provider) {
         return provider;
       }
@@ -67,11 +51,10 @@ export class AIManager {
   }
 
   static getDefaultModel(provider: AIProvider): string | undefined {
-    const config = vscode.workspace.getConfiguration("ai-generate-commit");
+    const config = this.getConfig();
     // Only check defaultModel if the provider is the default provider
-    const defaultProviderId = config.get<string>("defaultProviderId");
-    if (defaultProviderId === provider.id) {
-      const defaultModel = config.get<string>("defaultModel");
+    if (config.defaultProviderName === provider.name) {
+      const defaultModel = config.defaultModel;
       if (defaultModel && provider.models.some(m => m.id === defaultModel)) {
         return defaultModel;
       }

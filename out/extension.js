@@ -167,12 +167,13 @@ function activate(context) {
                     vscode.window.showInformationMessage("Models copied to clipboard.");
                 }
                 else if (action === "Update Config" && selected.provider) {
-                    const config = vscode.workspace.getConfiguration("ai-generate-commit");
-                    const currentProviders = config.get("providers") || [];
+                    const vsConfig = vscode.workspace.getConfiguration("ai-generate-commit");
+                    const config = vsConfig.get("config") || {};
+                    const currentProviders = config.providers || [];
                     const index = currentProviders.findIndex((p) => p.id === selected.provider.id);
                     if (index !== -1) {
                         currentProviders[index].models = models.map((m) => m.id);
-                        await config.update("providers", currentProviders, vscode.ConfigurationTarget.Global);
+                        await vsConfig.update("config", { ...config, providers: currentProviders }, vscode.ConfigurationTarget.Global);
                         vscode.window.showInformationMessage(`Updated models for ${selected.provider.name}.`);
                     }
                 }

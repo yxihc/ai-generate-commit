@@ -89,23 +89,19 @@ export class SettingsPanel {
   }
 
   private _sendConfig(webview: vscode.Webview) {
-    const config = vscode.workspace.getConfiguration("ai-generate-commit");
-    const providers = config.get<any[]>("providers") || [];
-    const defaultProviderId = config.get<string>("defaultProviderId") || "";
-    const defaultModel = config.get<string>("defaultModel") || "";
-    const language = config.get<string>("language") || "zh-CN";
-    const customPrompt = config.get<string>("customPrompt") || "";
+    const vsConfig = vscode.workspace.getConfiguration("ai-generate-commit");
+    const config = vsConfig.get<any>("config") || {};
     // 获取 VS Code 界面语言
     const uiLanguage = vscode.env.language;
 
     webview.postMessage({
       command: "config-data",
       data: {
-        providers,
-        defaultProviderId,
-        defaultModel,
-        language,
-        customPrompt,
+        providers: config.providers || [],
+        defaultProviderName: config.defaultProviderName || "",
+        defaultModel: config.defaultModel || "",
+        language: config.language || "zh-CN",
+        customPrompt: config.customPrompt || "",
         uiLanguage,
         providerTypes: [...providerTypes],
       },
@@ -113,30 +109,16 @@ export class SettingsPanel {
   }
 
   private async _saveConfig(data: any) {
-    const config = vscode.workspace.getConfiguration("ai-generate-commit");
-    await config.update(
-      "providers",
-      data.providers,
-      vscode.ConfigurationTarget.Global
-    );
-    await config.update(
-      "defaultProviderId",
-      data.defaultProviderId,
-      vscode.ConfigurationTarget.Global
-    );
-    await config.update(
-      "defaultModel",
-      data.defaultModel,
-      vscode.ConfigurationTarget.Global
-    );
-    await config.update(
-      "language",
-      data.language,
-      vscode.ConfigurationTarget.Global
-    );
-    await config.update(
-      "customPrompt",
-      data.customPrompt,
+    const vsConfig = vscode.workspace.getConfiguration("ai-generate-commit");
+    await vsConfig.update(
+      "config",
+      {
+        providers: data.providers,
+        defaultProviderName: data.defaultProviderName,
+        defaultModel: data.defaultModel,
+        language: data.language,
+        customPrompt: data.customPrompt,
+      },
       vscode.ConfigurationTarget.Global
     );
   }
