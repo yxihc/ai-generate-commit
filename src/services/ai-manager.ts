@@ -1,9 +1,6 @@
 import * as vscode from "vscode";
-import { createOpenAI } from "@ai-sdk/openai";
-import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { AIProvider, AIModel } from "../types/config";
-import { Logger } from "../utils/logger";
-import { localize } from "../utils/i18n";
+import { createModel, fetchModels } from "../aiProvider";
 
 export class AIManager {
   static getConfig() {
@@ -21,9 +18,9 @@ export class AIManager {
       .map((p: any) => ({
         ...p,
         // Normalize models: convert string[] to AIModel[]
-        models: (p.models || []).map((m: any) => 
-          typeof m === 'string' ? { id: m } : m
-        )
+        models: (p.models || []).map((m: any) =>
+          typeof m === "string" ? { id: m } : m
+        ),
       }));
   }
 
@@ -55,7 +52,7 @@ export class AIManager {
     // Only check defaultModel if the provider is the default provider
     if (config.defaultProviderName === provider.name) {
       const defaultModel = config.defaultModel;
-      if (defaultModel && provider.models.some(m => m.id === defaultModel)) {
+      if (defaultModel && provider.models.some((m) => m.id === defaultModel)) {
         return defaultModel;
       }
     }
@@ -68,113 +65,10 @@ export class AIManager {
   }
 
   static createModel(provider: AIProvider, modelId: string) {
-    Logger.log(
-      `Creating model for provider: ${provider.name} (${provider.type}), model: ${modelId}`
-    );
-
-    switch (provider.type) {
-      case "openai":
-      case "openai-compatible":
-        if (provider.baseUrl) {
-          const openaiCompatible = createOpenAICompatible({
-            name: provider.type,
-            apiKey: provider.apiKey,
-            baseURL: provider.baseUrl,
-          });
-          return openaiCompatible(modelId);
-        } else {
-          const openai = createOpenAI({
-            apiKey: provider.apiKey,
-            // baseURL is optional for standard openai
-          });
-          return openai(modelId);
-        }
-
-      case "azure-openai":
-        if (provider.baseUrl) {
-          const azureOpenai = createOpenAICompatible({
-            name: "azure-openai",
-            apiKey: provider.apiKey,
-            baseURL: provider.baseUrl,
-          });
-          return azureOpenai(modelId);
-        }
-        throw new Error(
-          "Azure OpenAI requires a baseUrl. Please provide your Azure OpenAI endpoint."
-        );
-
-      // For others, we might need specific implementation or fallback to compatible
-      case "gemini":
-        // TODO: Implement Gemini specific provider or use compatible if URL provided
-        if (provider.baseUrl) {
-          const openaiCompatible = createOpenAICompatible({
-            name: "gemini-compatible",
-            apiKey: provider.apiKey,
-            baseURL: provider.baseUrl,
-          });
-          return openaiCompatible(modelId);
-        }
-        throw new Error(
-          "Gemini native support not implemented yet. Please use openai-compatible type with a proxy or provide a baseUrl."
-        );
-
-      case "anthropic":
-        if (provider.baseUrl) {
-          const openaiCompatible = createOpenAICompatible({
-            name: "anthropic-compatible",
-            apiKey: provider.apiKey,
-            baseURL: provider.baseUrl,
-          });
-          return openaiCompatible(modelId);
-        }
-        throw new Error(
-          "Anthropic native support not implemented yet. Please use openai-compatible type with a proxy or provide a baseUrl."
-        );
-
-      default:
-        throw new Error(`Unsupported provider type: ${provider.type}`);
-    }
+    return createModel(provider, modelId);
   }
 
   static async fetchModels(provider: AIProvider): Promise<AIModel[]> {
-    if (!provider.baseUrl) {
-      throw new Error("Cannot fetch models without a base URL.");
-    }
-
-    try {
-      // Try standard OpenAI models endpoint
-      // It's usually GET /v1/models
-      let url = provider.baseUrl;
-      if (!url.endsWith("/")) {
-        url += "/";
-      }
-      // Handle cases where baseUrl already includes /v1
-      if (!url.includes("/models")) {
-        url += "models";
-      }
-
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${provider.apiKey}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch models: ${response.statusText}`);
-      }
-
-      const data = (await response.json()) as any;
-      if (data.data && Array.isArray(data.data)) {
-        return data.data.map((m: any) => ({
-          id: m.id,
-          name: m.name || m.id, // Some providers like OpenRouter return name
-          group: m.group, // Some providers might return group
-        }));
-      }
-      return [];
-    } catch (error: any) {
-      Logger.log(`Error fetching models: ${error.message}`);
-      throw error;
-    }
+    return fetchModels(provider);
   }
 }
