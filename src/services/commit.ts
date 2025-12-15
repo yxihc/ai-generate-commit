@@ -55,7 +55,7 @@ export async function generateCommitMessage(
           Logger.log(working);
         }
 
-        const diffToProcess = staged || working;
+        const diffToProcess = `${working} ${staged}`;
 
         if (!diffToProcess) {
           Logger.log("No changes detected.");
