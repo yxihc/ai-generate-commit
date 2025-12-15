@@ -41,7 +41,7 @@ export class SettingsPanel {
       column || vscode.ViewColumn.One,
       {
         enableScripts: true,
-        localResourceRoots: [vscode.Uri.joinPath(extensionUri, "media")],
+        localResourceRoots: [vscode.Uri.joinPath(extensionUri, "seeting-ui")],
       }
     );
 
@@ -106,6 +106,7 @@ export class SettingsPanel {
         defaultProviderName: config.defaultProviderName || "",
         defaultModel: config.defaultModel || "",
         language: config.language || "zh-CN",
+        commitType: config.commitType || "",
         customPrompt: config.customPrompt || "",
         uiLanguage,
         providerTypes: [...providerTypes],
@@ -122,6 +123,7 @@ export class SettingsPanel {
         defaultProviderName: data.defaultProviderName,
         defaultModel: data.defaultModel,
         language: data.language,
+        commitType: data.commitType,
         customPrompt: data.customPrompt,
       },
       vscode.ConfigurationTarget.Global

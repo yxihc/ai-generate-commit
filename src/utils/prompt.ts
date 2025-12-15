@@ -3,20 +3,11 @@ import * as path from "path";
 import { Logger } from "./logger";
 import { FileUtils } from "./file";
 import { RULE_DIR_NAMES, WORKSPACE_PROMPT_FILE } from "../app-config";
+import { getDefaultPrompt } from "../prompt/sytem.prompt";
+import { aicommitGeneratePrompt, CommitType } from "../prompt/aicommit.prompt";
 
 export class PromptUtils {
   // ==================== 第一级：内置系统提示词 ====================
-
-  /**
-   * 获取内置默认提示词（硬编码兜底）
-   */
-  private static getDefaultPrompt(): string {
-    return `You are a helpful assistant that generates conventional commit messages based on git diffs.
-Please generate a commit message for the following diff.
-The commit message should follow the Conventional Commits specification.
-Only return the commit message, no other text.`;
-  }
-
   /**
    * 获取内置提示词模板文件内容
    */
@@ -24,17 +15,6 @@ Only return the commit message, no other text.`;
     const promptDir = path.join(__dirname, "../../prompt");
     const promptPath = path.join(promptDir, `${language}.md`);
     return FileUtils.readFile(promptPath) || "";
-  }
-
-  /**
-   * 获取系统内置提示词（模板文件 > 默认提示词）
-   */
-  private static getSystemPrompt(language: string): string {
-    const templateContent = this.getBuiltinPromptTemplate(language);
-    if (templateContent) {
-      return templateContent;
-    }
-    return this.getDefaultPrompt();
   }
 
   // ==================== 第二级：用户自定义提示词 ====================
@@ -123,6 +103,24 @@ Only return the commit message, no other text.`;
   }
 
   /**
+   * 获取用户配置的 commitType
+   */
+  private static getCommitType(): CommitType {
+    const vsConfig = vscode.workspace.getConfiguration("ai-generate-commit");
+    const config = vsConfig.get<any>("config") || {};
+    const commitType = config.commitType || "";
+    // 验证是否为有效的 CommitType
+    if (
+      commitType === "" ||
+      commitType === "conventional" ||
+      commitType === "gitmoji"
+    ) {
+      return commitType as CommitType;
+    }
+    return "";
+  }
+
+  /**
    * 获取纯系统提示词（不含 diff）
    */
   public static getFinllyPrompt(language: string): string {
@@ -138,18 +136,16 @@ Only return the commit message, no other text.`;
       Logger.log("Using custom prompt as customPrompt");
       return customPrompt;
     }
-    // 3. 低优先级：系统多语言提示词
-    const systemPrompt = this.getSystemPrompt(language);
-    if (systemPrompt) {
-      Logger.log("Using custom prompt as systemPrompt");
-      return systemPrompt;
+    // 3. 使用内置系统提示词（根据 commitType 生成）
+    const commitType = this.getCommitType();
+
+    if (!commitType) {
+      return getDefaultPrompt(language);
     }
-    // 4. 低优先级：获取内置默认提示词（硬编码兜底）
-    const defaultPrompt = this.getDefaultPrompt();
-    if (defaultPrompt) {
-      Logger.log("Using custom prompt as defaultPrompt");
-      return defaultPrompt;
-    }
-    return "";
+    const builtinPrompt = aicommitGeneratePrompt(language, 72, commitType);
+    Logger.log(
+      `Using builtin prompt with commitType: ${commitType || "default"}`
+    );
+    return builtinPrompt;
   }
 }

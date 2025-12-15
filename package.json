@@ -75,6 +75,7 @@
             "defaultProviderName": "",
             "defaultModel": "",
             "language": "zh-CN",
+            "commitType": "",
             "customPrompt": ""
           },
           "scope": "application"

@@ -694,8 +694,13 @@
             v-model="uiLanguage"
             style="width: auto; padding: 6px 10px; font-size: 12px"
           >
-            <option value="zh-CN">🇨🇳 中文</option>
-            <option value="en">🇺🇸 English</option>
+            <option
+              v-for="lang in languageOptions"
+              :key="lang.value"
+              :value="lang.value"
+            >
+              {{ lang.label }}
+            </option>
           </select>
           <button @click="addProvider">
             <span>+</span> {{ t.addProvider }}
@@ -961,9 +966,35 @@
         <div class="form-group">
           <label>{{ t.commitLanguage }}</label>
           <select v-model="language">
-            <option value="zh-CN">简体中文</option>
-            <option value="en-US">English</option>
+            <option
+              v-for="lang in languageOptions"
+              :key="lang.value"
+              :value="lang.value"
+            >
+              {{ lang.label }}
+            </option>
           </select>
+        </div>
+        <div class="form-group">
+          <label>{{ t.commitType }}</label>
+          <select v-model="commitType">
+            <option
+              v-for="ct in commitTypeOptions"
+              :key="ct.value"
+              :value="ct.value"
+            >
+              {{ ct.label }}
+            </option>
+          </select>
+          <div
+            style="
+              margin-top: 8px;
+              font-size: 12px;
+              color: var(--vscode-descriptionForeground);
+            "
+          >
+            {{ t.commitTypeHint }}
+          </div>
         </div>
         <div class="form-group">
           <div class="form-label">
@@ -1223,12 +1254,18 @@
       const { createApp, ref, reactive, computed, onMounted } = Vue;
       const vscode = acquireVsCodeApi();
 
+      // 语言选项
+      const languageOptions = [
+        { value: "zh-CN", label: "简体中文" },
+        { value: "en-US", label: "English" },
+      ];
+
       // 国际化文本
       const i18n = {
         "zh-CN": {
-          title: "AI 提供者配置",
-          addProvider: "添加提供者",
-          noProviders: '暂无提供者配置，点击"添加提供者"开始。',
+          title: "AI 模型服务商商",
+          addProvider: "添加模型服务商",
+          noProviders: '暂无模型服务商配置，点击"添加模型服务商"开始。',
           enabled: "已启用",
           disabled: "已禁用",
           models: "模型",
@@ -1244,11 +1281,13 @@
           saving: "保存中...",
           noModels: "暂无模型配置",
           defaultSettings: "默认设置",
-          defaultProvider: "默认提供者",
+          defaultProvider: "默认模型服务商",
           defaultModel: "默认模型",
-          selectProvider: "-- 选择提供者 --",
+          selectProvider: "-- 选择模型服务商 --",
           selectModel: "-- 选择模型 --",
           commitLanguage: "提交信息语言",
+          commitType: "提交格式",
+          commitTypeHint: "选择提交信息的格式风格",
           customPrompt: "自定义提示词",
           customPromptHint: "优先级：工作区规则 > 自定义提示词 > 系统提示词",
           customPromptPlaceholder:
@@ -1260,11 +1299,11 @@
           modelId: "模型 ID",
           modelIdPlaceholder: "gpt-4, claude-3-opus, etc.",
           modelName: "模型名称 (可选)",
-          addProviderTitle: "添加提供者",
-          providerType: "提供者类型",
+          addProviderTitle: "添加模型服务商",
+          providerType: "模型服务商类型",
           providerTypePlaceholder: "-- 请选择 --",
-          providerName: "提供者名称",
-          providerNamePlaceholder: "输入提供者名称",
+          providerName: "模型服务商名称",
+          providerNamePlaceholder: "输入模型服务商名称",
           manageModels: "模型",
           searchModels: "搜索模型 ID 或名称",
           fetchingModels: "正在获取模型列表...",
@@ -1277,10 +1316,10 @@
           fetchFailed: "获取模型失败: ",
           sendFailed: "发送失败: ",
           configSaved: "配置已保存",
-          selectProviderType: "请选择提供者类型",
-          enterProviderName: "请输入提供者名称",
-          providerExists: "提供者名称已存在",
-          enterProviderNamePrompt: "输入提供者名称:",
+          selectProviderType: "请选择模型服务商类型",
+          enterProviderName: "请输入模型服务商名称",
+          providerExists: "模型服务商名称已存在",
+          enterProviderNamePrompt: "输入模型服务商名称:",
           uiLanguageLabel: "界面语言",
         },
         en: {
@@ -1308,6 +1347,8 @@
           selectProvider: "-- Select Provider --",
           selectModel: "-- Select Model --",
           commitLanguage: "Commit Message Language",
+          commitType: "Commit Format",
+          commitTypeHint: "Choose the format style for commit messages",
           customPrompt: "Custom Prompt",
           customPromptHint:
             "Priority: Workspace rules > Custom prompt > System prompt",
@@ -1352,8 +1393,26 @@
           const defaultProviderName = ref("");
           const defaultModel = ref("");
           const language = ref("zh-CN");
+          const commitType = ref("");
           const customPrompt = ref("");
-          const uiLanguage = ref("en");
+
+          // 提交格式选项
+          const commitTypeOptions = computed(() => {
+            const lang = uiLanguage.value.startsWith("zh") ? "zh-CN" : "en";
+            if (lang === "zh-CN") {
+              return [
+                { value: "", label: "系统默认" },
+                { value: "conventional", label: "Conventional Commits" },
+                { value: "gitmoji", label: "Gitmoji" },
+              ];
+            }
+            return [
+              { value: "", label: "System Default" },
+              { value: "conventional", label: "Conventional Commits" },
+              { value: "gitmoji", label: "Gitmoji" },
+            ];
+          });
+          const uiLanguage = ref("en-US");
           const showAddModelModal = ref(false);
           const currentEditingProvider = ref(null);
           const toast = reactive({ show: false, message: "", type: "success" });
@@ -1424,10 +1483,11 @@
                   message.data.defaultProviderName || "";
                 defaultModel.value = message.data.defaultModel || "";
                 language.value = message.data.language || "zh-CN";
+                commitType.value = message.data.commitType || "";
                 customPrompt.value = message.data.customPrompt || "";
                 // 如果系统语言以 zh 开头则使用中文，否则默认英文
-                const sysLang = message.data.uiLanguage || "en";
-                uiLanguage.value = sysLang.startsWith("zh") ? "zh-CN" : "en";
+                const sysLang = message.data.uiLanguage || "en-US";
+                uiLanguage.value = sysLang.startsWith("zh") ? "zh-CN" : "en-US";
                 // 从后端获取 providerTypes
                 if (message.data.providerTypes) {
                   providerTypes.value = message.data.providerTypes.map(
@@ -1458,6 +1518,7 @@
                 }
               } else if (message.command === "fetch-error") {
                 if (message.data?.forManage) {
+                  manageModels.value = [];
                   manageLoading.value = false;
                   showToast(getT().fetchFailed + message.error, "error");
                 } else {
@@ -1789,6 +1850,7 @@
                     defaultProviderName: defaultProviderName.value,
                     defaultModel: defaultModel.value,
                     language: language.value,
+                    commitType: commitType.value,
                     customPrompt: customPrompt.value,
                   },
                 })
@@ -1813,6 +1875,8 @@
             defaultProviderName,
             defaultModel,
             language,
+            commitType,
+            commitTypeOptions,
             customPrompt,
             currentProviderModels,
             enabledProviders,
@@ -1823,6 +1887,7 @@
             saving,
             t,
             uiLanguage,
+            languageOptions,
             addProvider,
             removeProvider,
             editProviderName,

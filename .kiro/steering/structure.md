@@ -21,7 +21,7 @@ src/
     └── settings.html     # 设置界面模板
 
 prompt/                   # 按语言区分的提示词模板
-media/                    # Webview 资源（Vue.js、HTML）
+seeting-ui/                    # Webview 资源（Vue.js、HTML）
 ```
 
 ## 关键模式

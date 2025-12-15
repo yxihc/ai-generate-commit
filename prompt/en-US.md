@@ -7,5 +7,3 @@ Rules:
 4. The description should be concise and in imperative mood (e.g., "add feature" not "added feature").
 5. Only return the commit message. Do not include any explanation or markdown formatting (like ```).
 
-Diff:
-${diff}
