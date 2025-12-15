@@ -1,7 +1,7 @@
 {
-  "displayName": "AI 生成提交",
+  "displayName": "CommitAgent",
   "description": "使用 AI 生成提交信息",
-  "command.title": "AI 生成提交日志",
-  "config.openConfigurationPage": "[👉 打开配置面板](command:ai-generate-commit.configure)\n\n所有设置都在配置面板中管理。",
+  "command.title": "CommitAgent 提交日志",
+  "config.openConfigurationPage": "[👉 打开配置面板](command:commitagent.configure)\n\n所有设置都在配置面板中管理。",
   "openai.api.key.missing": "OpenAI API 密钥缺失，请在设置中配置。"
 }

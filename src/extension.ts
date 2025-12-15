@@ -9,7 +9,7 @@ export function activate(context: vscode.ExtensionContext) {
   console.log(
     localize(
       "extension.activated",
-      '恭喜，您的扩展 "ai-generate-commit" 已激活！'
+      '恭喜，您的扩展 "CommitAgent" 已激活！'
     )
   );
 

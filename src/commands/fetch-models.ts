@@ -119,7 +119,7 @@ async function updateProviderModels(
   provider: AIProvider,
   models: { id: string }[]
 ): Promise<void> {
-  const vsConfig = vscode.workspace.getConfiguration("ai-generate-commit");
+  const vsConfig = vscode.workspace.getConfiguration("commitagent");
   const config = vsConfig.get<any>("config") || {};
   const currentProviders = config.providers || [];
   const index = currentProviders.findIndex((p: any) => p.id === provider.id);

@@ -37,7 +37,7 @@ export class SettingsPanel {
     // Otherwise, create a new panel.
     const panel = vscode.window.createWebviewPanel(
       "aiGenerateCommitSettings",
-      "AI Commit Settings",
+      "CommitAgent Settings",
       column || vscode.ViewColumn.One,
       {
         enableScripts: true,
@@ -94,7 +94,7 @@ export class SettingsPanel {
   }
 
   private _sendConfig(webview: vscode.Webview) {
-    const vsConfig = vscode.workspace.getConfiguration("ai-generate-commit");
+    const vsConfig = vscode.workspace.getConfiguration("commitagent");
     const config = vsConfig.get<any>("config") || {};
     // 获取 VS Code 界面语言
     const uiLanguage = vscode.env.language;
@@ -115,7 +115,7 @@ export class SettingsPanel {
   }
 
   private async _saveConfig(data: any) {
-    const vsConfig = vscode.workspace.getConfiguration("ai-generate-commit");
+    const vsConfig = vscode.workspace.getConfiguration("commitagent");
     await vsConfig.update(
       "config",
       {

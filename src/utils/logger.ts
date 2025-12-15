@@ -5,7 +5,7 @@ export class Logger {
 
     public static get outputChannel(): vscode.OutputChannel {
         if (!this._outputChannel) {
-            this._outputChannel = vscode.window.createOutputChannel('AI Generate Commit');
+            this._outputChannel = vscode.window.createOutputChannel('CommitAgent');
         }
         return this._outputChannel;
     }

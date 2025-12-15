@@ -1,7 +1,7 @@
 {
-  "displayName": "AI Generate Commit",
+  "displayName": "CommitAgent",
   "description": "Generate commit messages using AI",
-  "command.title": "AI Generate Commit",
-  "config.openConfigurationPage": "[👉 Open Configuration Panel](command:ai-generate-commit.configure)\n\nAll settings are managed in the configuration panel.",
+  "command.title": "CommitAgent",
+  "config.openConfigurationPage": "[👉 Open Configuration Panel](command:commitagent.configure)\n\nAll settings are managed in the configuration panel.",
   "openai.api.key.missing": "OpenAI API Key is missing. Please configure it in settings."
 }

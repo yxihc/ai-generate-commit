@@ -8,7 +8,7 @@ const commands_1 = require("./commands");
  * 插件激活时调用的方法
  */
 function activate(context) {
-    console.log((0, i18n_1.localize)("extension.activated", '恭喜，您的扩展 "ai-generate-commit" 已激活！'));
+    console.log((0, i18n_1.localize)("extension.activated", '恭喜，您的扩展 "CommitAgent" 已激活！'));
     const disposables = (0, commands_1.registerCommands)(context);
     context.subscriptions.push(...disposables);
 }

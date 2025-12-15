@@ -4,8 +4,8 @@
 
 // 工作区规则目录名称（支持拼写错误的旧目录名）
 export const RULE_DIR_NAMES = [
-  ".ai-generate-commit-rules",
-  ".ai-genrate-commit-rules",
+  ".commitagent-rules",
+  ".commitgent-rules",
 ];
 
 // 工作区提示词文件名

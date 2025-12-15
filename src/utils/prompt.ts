@@ -23,7 +23,7 @@ export class PromptUtils {
    * 获取用户自定义提示词配置
    */
   private static getCustomPrompt(): string {
-    const vsConfig = vscode.workspace.getConfiguration("ai-generate-commit");
+    const vsConfig = vscode.workspace.getConfiguration("commitagent");
     const config = vsConfig.get<any>("config") || {};
     return (config.customPrompt || "").trim();
   }
@@ -85,7 +85,7 @@ export class PromptUtils {
    * 获取额外规则（工作区规则 > 自定义提示词）
    */
   private static getAdditionalRules(): string {
-    // 1. 最高优先级：工作区 .ai-generate-commit-rules 目录
+    // 1. 最高优先级：工作区 .commitagent-rules 目录
     const workspaceRules = this.getWorkspaceRules();
     if (workspaceRules) {
       Logger.log("Using workspace rules as additional instructions");
@@ -106,7 +106,7 @@ export class PromptUtils {
    * 获取用户配置的 commitType
    */
   private static getCommitType(): CommitType {
-    const vsConfig = vscode.workspace.getConfiguration("ai-generate-commit");
+    const vsConfig = vscode.workspace.getConfiguration("commitagent");
     const config = vsConfig.get<any>("config") || {};
     const commitType = config.commitType || "";
     // 验证是否为有效的 CommitType
@@ -124,7 +124,7 @@ export class PromptUtils {
    * 获取纯系统提示词（不含 diff）
    */
   public static getFinllyPrompt(language: string): string {
-    // 1. 最高优先级：工作区 .ai-generate-commit-rules 目录
+    // 1. 最高优先级：工作区 .commitagent-rules 目录
     const workspaceRules = this.getWorkspaceRules();
     if (workspaceRules) {
       Logger.log("Using workspace rules as workspaceRules");

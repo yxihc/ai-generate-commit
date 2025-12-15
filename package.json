@@ -1,5 +1,5 @@
 {
-  "name": "ai-generate-commit",
+  "name": "commitagent",
   "displayName": "%displayName%",
   "description": "%description%",
   "version": "0.0.1",
@@ -14,26 +14,26 @@
   "contributes": {
     "commands": [
       {
-        "command": "ai-generate-commit.generate",
+        "command": "commitagent.generate",
         "title": "%command.title%",
         "icon": "$(sparkle)"
       },
       {
-        "command": "ai-generate-commit.stopGenerate",
+        "command": "commitagent.stopGenerate",
         "title": "Stop Generate",
         "icon": "$(debug-stop)"
       },
       {
-        "command": "ai-generate-commit.selectAndGenerate",
+        "command": "commitagent.selectAndGenerate",
         "title": "Select Model & Generate Commit",
         "icon": "$(list-selection)"
       },
       {
-        "command": "ai-generate-commit.fetchModels",
+        "command": "commitagent.fetchModels",
         "title": "Fetch AI Models from Provider"
       },
       {
-        "command": "ai-generate-commit.configure",
+        "command": "commitagent.configure",
         "title": "Configure AI Providers",
         "icon": "$(gear)"
       }
@@ -41,34 +41,34 @@
     "menus": {
       "scm/title": [
         {
-          "command": "ai-generate-commit.generate",
+          "command": "commitagent.generate",
           "group": "navigation@1",
-          "when": "!ai-generate-commit.isGenerating"
+          "when": "!commitagent.isGenerating"
         },
         {
-          "command": "ai-generate-commit.stopGenerate",
+          "command": "commitagent.stopGenerate",
           "group": "navigation@1",
-          "when": "ai-generate-commit.isGenerating"
+          "when": "commitagent.isGenerating"
         },
         {
-          "command": "ai-generate-commit.selectAndGenerate",
+          "command": "commitagent.selectAndGenerate",
           "group": "navigation@2"
         },
         {
-          "command": "ai-generate-commit.configure",
+          "command": "commitagent.configure",
           "group": "navigation@3"
         }
       ]
     },
     "configuration": {
-      "title": "AI Generate Commit",
+      "title": "CommitAgent",
       "properties": {
-        "ai-generate-commit.openConfigurationPage": {
+        "commitagent.openConfigurationPage": {
           "type": "boolean",
           "default": false,
           "markdownDescription": "%config.openConfigurationPage%"
         },
-        "ai-generate-commit.config": {
+        "commitagent.config": {
           "type": "object",
           "default": {
             "providers": [],

@@ -1,1 +1,1 @@
-# ai-generate-commit
+# CommitAgent

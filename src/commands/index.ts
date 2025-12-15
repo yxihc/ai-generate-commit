@@ -18,23 +18,23 @@ export function registerCommands(
 ): vscode.Disposable[] {
   const commands: CommandDefinition[] = [
     {
-      id: "ai-generate-commit.generate",
+      id: "commitagent.generate",
       handler: handleGenerate,
     },
     {
-      id: "ai-generate-commit.stopGenerate",
+      id: "commitagent.stopGenerate",
       handler: () => GenerationState.stop(),
     },
     {
-      id: "ai-generate-commit.selectAndGenerate",
+      id: "commitagent.selectAndGenerate",
       handler: handleSelectAndGenerate,
     },
     {
-      id: "ai-generate-commit.fetchModels",
+      id: "commitagent.fetchModels",
       handler: handleFetchModels,
     },
     {
-      id: "ai-generate-commit.configure",
+      id: "commitagent.configure",
       handler: () => SettingsPanel.createOrShow(context.extensionUri),
     },
   ];

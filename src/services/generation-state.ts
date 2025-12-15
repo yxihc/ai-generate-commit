@@ -23,7 +23,7 @@ class GenerationStateManager {
     this._cancellationSource = new vscode.CancellationTokenSource();
     vscode.commands.executeCommand(
       "setContext",
-      "ai-generate-commit.isGenerating",
+      "commitagent.isGenerating",
       true
     );
     return this._cancellationSource.token;
@@ -49,7 +49,7 @@ class GenerationStateManager {
     }
     vscode.commands.executeCommand(
       "setContext",
-      "ai-generate-commit.isGenerating",
+      "commitagent.isGenerating",
       false
     );
   }

@@ -4,7 +4,7 @@ import { createModel, fetchModels } from "../aiProvider";
 
 export class AIManager {
   static getConfig() {
-    const vsConfig = vscode.workspace.getConfiguration("ai-generate-commit");
+    const vsConfig = vscode.workspace.getConfiguration("commitagent");
     return vsConfig.get<any>("config") || {};
   }
 
