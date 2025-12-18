@@ -2,7 +2,7 @@
   "name": "commitagent",
   "displayName": "%displayName%",
   "description": "%description%",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "publisher": "CommitAgent",
   "icon": "logo.png",
   "engines": {
